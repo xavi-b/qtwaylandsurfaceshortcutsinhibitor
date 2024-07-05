@@ -53,7 +53,14 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    QPushButton w;
+    auto display = app.nativeInterface<QNativeInterface::QWaylandApplication>()->display();
+    qDebug() << "wl_display_connect:" << (size_t)display;
+    struct wl_registry *registry = wl_display_get_registry(display);
+    int res = wl_registry_add_listener(registry, &registry_listener, nullptr);
+    qDebug() << "wl_registry_add_listener:" << res;
+
+    QPushButton w("Click");
+    w.setFixedSize(200, 100);
     w.show();
     QObject::connect(&w, &QPushButton::clicked, [&]() {
         if (inhibitor) {
